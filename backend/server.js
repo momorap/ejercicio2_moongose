@@ -48,6 +48,19 @@ app.get('/api/categorias', async (req, res, next) => {
   }
 });
 
+// Eliminar una categoría por ID
+app.delete('/api/categorias/:id', async (req, res, next) => {
+  try {
+    const categoria = await Category.findByIdAndDelete(req.params.id);
+    if (!categoria) {
+      return res.status(404).json({ message: 'Categoría no encontrada' });
+    }
+    res.json({ message: 'Categoría eliminada correctamente', categoria });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // ======================
 // 🔹 PRODUCTOS CRUDL
 // ======================
@@ -73,13 +86,13 @@ app.get('/api/productos', async (req, res, next) => {
     if (minPrice || maxPrice)
       filtro.price = { ...(minPrice && { $gte: Number(minPrice) }), ...(maxPrice && { $lte: Number(maxPrice) }) };
 
-    const productos = await Producto.find(filtro)
+    const productos = await Product.find(filtro)
       .populate('category', 'name')
       .sort({ [sortBy]: order === 'asc' ? 1 : -1 })
       .skip((page - 1) * limit)
       .limit(Number(limit));
 
-    const total = await Producto.countDocuments(filtro);
+    const total = await Product.countDocuments(filtro);
     res.json({ total, page: Number(page), limit: Number(limit), productos });
   } catch (error) {
     next(error);
