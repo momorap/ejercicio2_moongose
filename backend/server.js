@@ -1,8 +1,8 @@
 // 1. Requerir módulos
 import express from 'express';
 import mongoose from 'mongoose';
-import { Categoria } from './models/Category.js';
-import { Producto } from './models/Product.js';
+import { Category } from './models/Category.js';
+import { Product } from './models/Product.js';
 
 // 2. Crear app
 const app = express();
@@ -31,7 +31,7 @@ const conectarDB = async () => {
 app.post('/api/categorias', async (req, res, next) => {
   try {
     const { name, description, parentCategory } = req.body;
-    const nuevaCategoria = await Categoria.create({ name, description, parentCategory });
+    const nuevaCategoria = await Category.create({ name, description, parentCategory });
     res.status(201).json(nuevaCategoria);
   } catch (error) {
     error.status = 400;
@@ -41,7 +41,7 @@ app.post('/api/categorias', async (req, res, next) => {
 
 app.get('/api/categorias', async (req, res, next) => {
   try {
-    const categorias = await Categoria.find().populate('parentCategory', 'name');
+    const categorias = await Category.find().populate('parentCategory', 'name');
     res.json(categorias);
   } catch (error) {
     next(error);
@@ -55,7 +55,7 @@ app.get('/api/categorias', async (req, res, next) => {
 // Crear producto
 app.post('/api/productos', async (req, res, next) => {
   try {
-    const producto = await Producto.create(req.body);
+    const producto = await Product.create(req.body);
     res.status(201).json(producto);
   } catch (error) {
     error.status = 400;
@@ -89,7 +89,7 @@ app.get('/api/productos', async (req, res, next) => {
 // Obtener por ID
 app.get('/api/productos/:id', async (req, res, next) => {
   try {
-    const producto = await Producto.findById(req.params.id).populate('category', 'name');
+    const producto = await Product.findById(req.params.id).populate('category', 'name');
     if (!producto) throw new Error('Producto no encontrado');
     res.json(producto);
   } catch (error) {
@@ -101,7 +101,7 @@ app.get('/api/productos/:id', async (req, res, next) => {
 // Actualizar
 app.put('/api/productos/:id', async (req, res, next) => {
   try {
-    const producto = await Producto.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const producto = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!producto) throw new Error('Producto no encontrado para actualizar');
     res.json(producto);
   } catch (error) {
@@ -113,7 +113,7 @@ app.put('/api/productos/:id', async (req, res, next) => {
 // Eliminar (físico)
 app.delete('/api/productos/:id', async (req, res, next) => {
   try {
-    const eliminado = await Producto.findByIdAndDelete(req.params.id);
+    const eliminado = await Product.findByIdAndDelete(req.params.id);
     if (!eliminado) throw new Error('Producto no encontrado');
     res.json({ mensaje: 'Eliminado con éxito', eliminado });
   } catch (error) {

@@ -54,5 +54,5 @@ const productSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
-
-export const Producto = mongoose.model('Product', productSchema);
+//productSchema.index({ name: 'text', description: 'text' }); // Para búsqueda de texto completo
+export const Product = mongoose.model('Product', productSchema);

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const categoriaSchema = new mongoose.Schema({
+const categorySchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -9,9 +9,9 @@ const categoriaSchema = new mongoose.Schema({
     },
     description: String,
     parentCategory: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category',
-    default: null
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+        default: null
     },
     isActive: {
         type: Boolean,
@@ -20,4 +20,4 @@ const categoriaSchema = new mongoose.Schema({
 });
 
 
-export const Categoria = mongoose.model('Categoria', categoriaSchema);
+export const Category = mongoose.model('Category', categorySchema);
