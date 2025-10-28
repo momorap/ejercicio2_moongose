@@ -1,9 +1,8 @@
 // 1. Requerir módulos
-import express from 'express';
+import express from "express";
 import mongoose from 'mongoose';
-import { Category } from './models/Category.js';
-import { Product } from './models/Product.js';
-
+import categoryRoutes from "./routes/routesCategory.js";
+import productRoutes from "./routes/routesProduct.js";
 // 2. Crear app
 const app = express();
 
@@ -24,116 +23,18 @@ const conectarDB = async () => {
     process.exit(1);
   }
 };
-
 // ======================
-// 🔹 CATEGORÍAS
+// 🔹 CATEGORIA CRUDL
 // ======================
-app.post('/api/categorias', async (req, res, next) => {
-  try {
-    const { name, description, parentCategory } = req.body;
-    const nuevaCategoria = await Category.create({ name, description, parentCategory });
-    res.status(201).json(nuevaCategoria);
-  } catch (error) {
-    error.status = 400;
-    next(error);
-  }
-});
 
-app.get('/api/categorias', async (req, res, next) => {
-  try {
-    const categorias = await Category.find().populate('parentCategory', 'name');
-    res.json(categorias);
-  } catch (error) {
-    next(error);
-  }
-});
+app.use("/api/categoria",categoryRoutes);
 
-// Eliminar una categoría por ID
-app.delete('/api/categorias/:id', async (req, res, next) => {
-  try {
-    const categoria = await Category.findByIdAndDelete(req.params.id);
-    if (!categoria) {
-      return res.status(404).json({ message: 'Categoría no encontrada' });
-    }
-    res.json({ message: 'Categoría eliminada correctamente', categoria });
-  } catch (error) {
-    next(error);
-  }
-});
 
 // ======================
 // 🔹 PRODUCTOS CRUDL
 // ======================
 
-// Crear producto
-app.post('/api/productos', async (req, res, next) => {
-  try {
-    const producto = await Product.create(req.body);
-    res.status(201).json(producto);
-  } catch (error) {
-    error.status = 400;
-    next(error);
-  }
-});
-
-// Listar productos con filtros, paginación, búsqueda y sort
-app.get('/api/productos', async (req, res, next) => {
-  try {
-    const { search, minPrice, maxPrice, sortBy = 'price', order = 'asc', page = 1, limit = 10 } = req.query;
-    const filtro = {};
-
-    if (search) filtro.name = { $regex: search, $options: 'i' };
-    if (minPrice || maxPrice)
-      filtro.price = { ...(minPrice && { $gte: Number(minPrice) }), ...(maxPrice && { $lte: Number(maxPrice) }) };
-
-    const productos = await Product.find(filtro)
-      .populate('category', 'name')
-      .sort({ [sortBy]: order === 'asc' ? 1 : -1 })
-      .skip((page - 1) * limit)
-      .limit(Number(limit));
-
-    const total = await Product.countDocuments(filtro);
-    res.json({ total, page: Number(page), limit: Number(limit), productos });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Obtener por ID
-app.get('/api/productos/:id', async (req, res, next) => {
-  try {
-    const producto = await Product.findById(req.params.id).populate('category', 'name');
-    if (!producto) throw new Error('Producto no encontrado');
-    res.json(producto);
-  } catch (error) {
-    error.status = 404;
-    next(error);
-  }
-});
-
-// Actualizar
-app.put('/api/productos/:id', async (req, res, next) => {
-  try {
-    const producto = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if (!producto) throw new Error('Producto no encontrado para actualizar');
-    res.json(producto);
-  } catch (error) {
-    error.status = 400;
-    next(error);
-  }
-});
-
-// Eliminar (físico)
-app.delete('/api/productos/:id', async (req, res, next) => {
-  try {
-    const eliminado = await Product.findByIdAndDelete(req.params.id);
-    if (!eliminado) throw new Error('Producto no encontrado');
-    res.json({ mensaje: 'Eliminado con éxito', eliminado });
-  } catch (error) {
-    next(error);
-  }
-});
-
+app.use("/api/productos",productRoutes);
 // ======================
 // 🔹 ERROR HANDLING
 // ======================
