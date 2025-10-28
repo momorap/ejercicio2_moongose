@@ -1,5 +1,11 @@
 # ejercicio2_moongose
---- iniciar servidor
-''' cd backend
+## Integrantes
+ - Mora Arrossi
+ - Belen Ason
+  
+## Iniciar servidor
+``` 
+    cd backend
     npm install
-    npm run dev '''
+    npm run dev 
+```
